@@ -65,4 +65,7 @@ dependencies {
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+
+    // библиотека для вычислений математических выражений в калькуляторе
+    implementation 'net.objecthunter:exp4j:0.4.8'
 }

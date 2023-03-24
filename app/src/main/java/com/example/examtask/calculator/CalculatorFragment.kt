@@ -126,16 +126,33 @@ class CalculatorFragment : Fragment() {
             tvMain.text = (tvMain.text.toString() + "9")
         }
         b0.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "0")
+            val str: String = tvMain.text.toString()
+            // проверка, чтобы вначале был только один 0
+            if (!str.equals("0")) {
+                tvMain.text = (tvMain.text.toString() + "0")
+            }
         }
         bdot.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + ".")
+            val str: String = tvMain.text.toString()
+            // проверка, что вначале нет точки без целой части числа
+            if (!str.equals(".") and !str.isEmpty()) {
+                tvMain.text = (tvMain.text.toString() + ".")
+            }
+            else
+                tvMain.text = (tvMain.text.toString() + "0.")
+            // проверка, что точка только одна
+            // если символ точка не встретился ещё в сроке, то добавить точку
+//            if (str.indexOf(".")==-1){
+//                tvMain.text = (tvMain.text.toString() + ".")
+//            }
+
         }
         bplus.setOnClickListener {
             tvMain.text = (tvMain.text.toString() + "+")
         }
         bdiv.setOnClickListener {
-            if (tvMain.text.isEmpty())
+            val str: String = tvMain.text.toString()
+            if (str.isEmpty())
                 Toast.makeText(this.requireContext(), "Please enter a valid number!", Toast.LENGTH_SHORT).show()
             else
                 tvMain.text = (tvMain.text.toString() + "/")

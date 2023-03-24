@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 
 class CalculatorViewModel() : ViewModel() {
 
+//    fun setTextFields(str:String): String {
+//        append(str)
+//    }
     fun factorial(n: Int): Int {
         // this method is use to find factorial
         return if (n == 1 || n == 0) 1 else n * factorial(n - 1)
