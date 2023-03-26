@@ -12,6 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.examtask.R
 import com.example.examtask.databinding.FragmentCalculatorBinding
+
 class CalculatorFragment : Fragment() {
 
     //     Объявление переменных
@@ -29,7 +30,8 @@ class CalculatorFragment : Fragment() {
     lateinit var bfact: Button
     lateinit var bsquare: Button
     lateinit var bsqrt: Button
-//    lateinit var binv: Button
+
+    //    lateinit var binv: Button
     lateinit var b0: Button
     lateinit var b9: Button
     lateinit var b8: Button
@@ -56,9 +58,11 @@ class CalculatorFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = DataBindingUtil.inflate<FragmentCalculatorBinding>(inflater,
+        val binding = DataBindingUtil.inflate<FragmentCalculatorBinding>(
+            inflater,
             R.layout.fragment_calculator,
-            container, false)
+            container, false
+        )
         viewModelFactory = CalculatorViewModelFactory()
         viewModel = ViewModelProvider(this, viewModelFactory).get(CalculatorViewModel::class.java)
 
@@ -96,6 +100,8 @@ class CalculatorFragment : Fragment() {
         bequal = binding.bequal
         bdot = binding.bdot
         bdiv = binding.bdiv
+
+        var bracket_count: Int = 0  // считает количество открытых и закрытых скобок
 
         // Устанавливаем слушателей по нажатию на соответствующие кнопки
         b1.setOnClickListener {
@@ -137,8 +143,7 @@ class CalculatorFragment : Fragment() {
             // проверка, что вначале нет точки без целой части числа
             if (!str.equals(".") and !str.isEmpty()) {
                 tvMain.text = (tvMain.text.toString() + ".")
-            }
-            else
+            } else
                 tvMain.text = (tvMain.text.toString() + "0.")
             // проверка, что точка только одна
             // если символ точка не встретился ещё в сроке, то добавить точку
@@ -148,20 +153,75 @@ class CalculatorFragment : Fragment() {
 
         }
         bplus.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "+")
+            // при нажатии на + проверяем: у пользователя уже есть операция плюс на экране
+            // если операция плюс уже присутствует
+            // то ничего делать не будем
+            val str: String = tvMain.text.toString()
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                Toast.makeText(
+                    this.requireContext(),
+                    "Please enter a valid number!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else
+                tvMain.text = (tvMain.text.toString() + "+")
         }
         bdiv.setOnClickListener {
             val str: String = tvMain.text.toString()
-            if (str.isEmpty())
-                Toast.makeText(this.requireContext(), "Please enter a valid number!", Toast.LENGTH_SHORT).show()
-            else
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                Toast.makeText(
+                    this.requireContext(),
+                    "Please enter a valid number!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else
                 tvMain.text = (tvMain.text.toString() + "/")
         }
         bbrac1.setOnClickListener {
             tvMain.text = (tvMain.text.toString() + "(")
+            bracket_count += 1
         }
         bbrac2.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + ")")
+
+            if (bracket_count>0){
+                if(tvMain.text.toString().takeLast(1).equals("("))
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Error! You cannot close a parenthesis with an empty value!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                else{
+                    bracket_count -= 1
+                    tvMain.text = (tvMain.text.toString() + ")")
+                }
+            }
+            else
+                Toast.makeText(
+                    this.requireContext(),
+                    "Error! Open brace '(' not found!",
+                    Toast.LENGTH_SHORT
+                ).show()
+
         }
         bpi.setOnClickListener {
             // при нажатии на кнопку Пи, к строке значения добавляется значение числа Пи с точностью в 10 знаков после запятой
@@ -174,22 +234,157 @@ class CalculatorFragment : Fragment() {
             tvsec.text = (be.text.toString())
         }
         bsin.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "sin")
+            val str: String = tvMain.text.toString()
+            if (str.isNotEmpty()){
+                if (str.get(index = str.length - 1).toString().equals(".")
+                        || str.takeLast(3).equals("sin")
+                        || str.takeLast(3).equals("cos")
+                        || str.takeLast(3).equals("tan")
+                        || str.takeLast(3).equals("log")
+                        || str.takeLast(2).equals("ln"))
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                if (str.takeLast(1).equals("1")
+                    || str.takeLast(1).equals("2")
+                    || str.takeLast(1).equals("3")
+                    || str.takeLast(1).equals("4")
+                    || str.takeLast(1).equals("5")
+                    || str.takeLast(1).equals("6")
+                    || str.takeLast(1).equals("7")
+                    || str.takeLast(1).equals("8")
+                    || str.takeLast(1).equals("9")
+                    || str.takeLast(1).equals("0"))
+                    tvMain.text = (tvMain.text.toString() + "*sin")
+            }
+            else
+                tvMain.text = (tvMain.text.toString() + "sin")
         }
         bcos.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "cos")
+            val str: String = tvMain.text.toString()
+            if (str.isNotEmpty()){
+                if (str.get(index = str.length - 1).toString().equals(".")
+                    || str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln"))
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                if (str.takeLast(1).equals("1")
+                    || str.takeLast(1).equals("2")
+                    || str.takeLast(1).equals("3")
+                    || str.takeLast(1).equals("4")
+                    || str.takeLast(1).equals("5")
+                    || str.takeLast(1).equals("6")
+                    || str.takeLast(1).equals("7")
+                    || str.takeLast(1).equals("8")
+                    || str.takeLast(1).equals("9")
+                    || str.takeLast(1).equals("0"))
+                    tvMain.text = (tvMain.text.toString() + "*cos")
+            }
+            else
+                tvMain.text = (tvMain.text.toString() + "cos")
         }
         btan.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "tan")
+            val str: String = tvMain.text.toString()
+            if (str.isNotEmpty()){
+                if (str.get(index = str.length - 1).toString().equals(".")
+                    || str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln"))
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                if (str.takeLast(1).equals("1")
+                    || str.takeLast(1).equals("2")
+                    || str.takeLast(1).equals("3")
+                    || str.takeLast(1).equals("4")
+                    || str.takeLast(1).equals("5")
+                    || str.takeLast(1).equals("6")
+                    || str.takeLast(1).equals("7")
+                    || str.takeLast(1).equals("8")
+                    || str.takeLast(1).equals("9")
+                    || str.takeLast(1).equals("0"))
+                    tvMain.text = (tvMain.text.toString() + "*tan")
+            }
+            else
+                tvMain.text = (tvMain.text.toString() + "tan")
         }
 //        binv.setOnClickListener {
 //            tvMain.text = (tvMain.text.toString() + "^" + "(-1)")
 //        }
         bln.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "ln")
+            val str: String = tvMain.text.toString()
+            if (str.isNotEmpty()){
+                if (str.get(index = str.length - 1).toString().equals(".")
+                    || str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln"))
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                if (str.takeLast(1).equals("1")
+                    || str.takeLast(1).equals("2")
+                    || str.takeLast(1).equals("3")
+                    || str.takeLast(1).equals("4")
+                    || str.takeLast(1).equals("5")
+                    || str.takeLast(1).equals("6")
+                    || str.takeLast(1).equals("7")
+                    || str.takeLast(1).equals("8")
+                    || str.takeLast(1).equals("9")
+                    || str.takeLast(1).equals("0"))
+                    tvMain.text = (tvMain.text.toString() + "*ln")
+            }
+            else
+                tvMain.text = (tvMain.text.toString() + "ln")
         }
         blog.setOnClickListener {
-            tvMain.text = (tvMain.text.toString() + "log")
+            val str: String = tvMain.text.toString()
+            if (str.isNotEmpty()){
+                if (str.get(index = str.length - 1).toString().equals(".")
+                    || str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln"))
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                if (str.takeLast(1).equals("1")
+                    || str.takeLast(1).equals("2")
+                    || str.takeLast(1).equals("3")
+                    || str.takeLast(1).equals("4")
+                    || str.takeLast(1).equals("5")
+                    || str.takeLast(1).equals("6")
+                    || str.takeLast(1).equals("7")
+                    || str.takeLast(1).equals("8")
+                    || str.takeLast(1).equals("9")
+                    || str.takeLast(1).equals("0"))
+                    tvMain.text = (tvMain.text.toString() + "*log")
+            }
+            else
+                tvMain.text = (tvMain.text.toString() + "log")
         }
 
         bminus.setOnClickListener {
@@ -197,88 +392,247 @@ class CalculatorFragment : Fragment() {
             // если операция минус уже присутствует
             // то ничего делать не будем
             val str: String = tvMain.text.toString()
-            if (!str.get(index = str.length - 1).toString().equals("-")) {
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+//                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+            )
                 tvMain.text = (tvMain.text.toString() + "-")
-            }
+            else    // если функции sin пустые
+                if (str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln")
+                ) {
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (!str.get(index = str.length - 1).toString().equals("-")) {
+                    tvMain.text = (tvMain.text.toString() + "-")
+                }
         }
         bmul.setOnClickListener {
             // при нажатии на * проверяем: у пользователя уже есть операция произведения на экране
             // если операция произведения уже присутствует
             // то ничего делать не будем
             val str: String = tvMain.text.toString()
-            if (!str.get(index = str.length - 1).toString().equals("*")) {
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                Toast.makeText(
+                    this.requireContext(),
+                    "Please enter a valid number!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else
                 tvMain.text = (tvMain.text.toString() + "*")
-            }
         }
         bsqrt.setOnClickListener {
             val str: String = tvMain.text.toString()
-            if (str.isEmpty()) {
-                // если введенное число пусто, мы показываем сообщение об ошибке
-                Toast.makeText(this.requireContext(), "Please enter a valid number!", Toast.LENGTH_SHORT).show()
-            } else {
-                // вычисляем квадратный корень из заданного числа
-                val r = Math.sqrt(str.toDouble())
-                // получаем результат и выводим в виде строки
-                val result = r.toString()
-                tvMain.setText(result)
-            }
+
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
+                Toast.makeText(
+                    this.requireContext(),
+                    "Please enter a valid number!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else
+
+                if (viewModel.evaluate(str) < 0
+                )     // если число под корнем отрицательное
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Error! Negative number under root!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                else {
+                    val d = viewModel.evaluate(str)    // считаем число под корнем
+                    // вычисляем квадратный корень из заданного числа
+                    val sqrt = Math.sqrt(d)
+                    val longRes = sqrt.toLong()
+
+                    if (sqrt == longRes.toDouble())
+                        tvMain.setText(longRes.toString())  // пишем целое число в ответе
+                     else
+                        tvMain.setText(sqrt.toString())  // пишем рац число в ответе
+
+                    if (d==d.toLong().toDouble())
+                        tvsec.text = "√${d.toInt()}"
+                    else
+                        tvsec.text = "√${d}"
+                }
         }
         bequal.setOnClickListener {
             val str: String = tvMain.text.toString()
-            // по кнопке равенства (=) вычисляется результат
-            val result: Double = viewModel.evaluate(str)
-            // получаем результат и выводим в виде строки
-            val r = result.toString()
-            tvMain.setText(r)
-            tvsec.text = str
+            println(bracket_count)
+            if (bracket_count!=0)
+                Toast.makeText(
+                    this.requireContext(),
+                    "Error! Brackets '(' and ')' placed incorrectly!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            else {
+                // в конце строки не должно быть каких-то операций и точки
+                if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                    || str.get(index = str.length - 1).toString().equals("+")
+                    || str.get(index = str.length - 1).toString().equals("-")
+                    || str.get(index = str.length - 1).toString().equals("*")
+                    || str.get(index = str.length - 1).toString().equals("/")
+                    || str.get(index = str.length - 1).toString().equals("^")
+                    || str.get(index = str.length - 1).toString().equals("(")
+                    || str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln")
+                ) {
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Please enter a valid number!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    // по кнопке равенства (=) вычисляется результат
+                    val result = viewModel.evaluate(str)
+                    val longRes = result.toLong()
+                    if (result == longRes.toDouble())
+                        tvMain.setText(longRes.toString()) // пишем целое число в ответе
+                    else
+                        tvMain.setText(result.toString()) // пишем рац число в ответе
+                    tvsec.text = str
+                }
+            }
         }
         bac.setOnClickListener {
             // при нажатии на кнопку очищаются основное и дополнительное текстовое представление
             tvMain.setText("")
             tvsec.setText("")
+            bracket_count=0     // сбрасываем счётчик скобок
         }
         bc.setOnClickListener {
             // при нажатии на кнопку очищается последний символ,
             // также проверяется длина строки
             var str: String = tvMain.text.toString()
-            if (!str.equals("")) {
-                str = str.substring(0, str.length - 1)
+
+            if (str.isNotEmpty()) {
+                if (str.takeLast(1).equals("s") || str.takeLast(1).equals("g"))
+                    str = str.substring(0, str.length - 3)
+                else if (str.takeLast(1).equals("n"))
+                    if (str.takeLast(2).equals("ln"))
+                        str = str.substring(0, str.length - 2)
+                    else    // tan
+                        str = str.substring(0, str.length - 3)
+                else{
+                    if (str.takeLast(1).equals(")"))
+                        bracket_count += 1
+                    if (str.takeLast(1).equals("("))
+                        bracket_count -= 1
+                    str = str.substring(0, str.length - 1)
+                }
                 tvMain.text = str
             }
         }
         bsquare.setOnClickListener {
-            if (tvMain.text.toString().isEmpty()) {
-                // если введенное число пусто, мы показываем сообщение об ошибке
-                Toast.makeText(this.requireContext(), "Please enter a valid number!", Toast.LENGTH_SHORT).show()
+            val str: String = tvMain.text.toString()
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
+                Toast.makeText(
+                    this.requireContext(),
+                    "Please enter a valid number!",
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 // получаем значение и вычисляем квадрат числа
-                val d: Double = tvMain.getText().toString().toDouble()
+                val d = viewModel.evaluate(str)    // считаем число (выражение в скобках)
                 val square = d * d
-                tvMain.setText(square.toString())
-                tvsec.text = "$d²"
+                val longRes = square.toLong()
+                if (square == longRes.toDouble()) {
+                    tvMain.setText(longRes.toString()) // пишем целое число в ответе
+                    tvsec.text = "${d.toInt()}²"
+                } else {
+                    tvMain.setText(square.toString()) // пишем рац число в ответе
+                    tvsec.text = "$d²"
+                }
             }
         }
         bfact.setOnClickListener {
-            if (tvMain.text.toString().isEmpty()) {
-                // if the entered number is empty we are displaying an error message.
-                Toast.makeText(this.requireContext(), "Please enter a valid number!", Toast.LENGTH_SHORT).show()
-            } else {
-                // on below line we are getting int value
-                // and calculating the factorial value of the entered number.
-                val value: Int = tvMain.text.toString().toInt()
-                val fact: Int = viewModel.factorial(value)
-                tvMain.setText(fact.toString())
-                tvsec.text = "$value`!"
-            }
+            val str: String = tvMain.text.toString()
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")) {
+                // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
+                Toast.makeText(
+                    this.requireContext(),
+                    "Please enter a valid number!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else  // если число под факториалом отрицательное
+                if (viewModel.evaluate(str).toDouble() < 0)
+                Toast.makeText(
+                    this.requireContext(),
+                    "Error! Negative number under factorial!",
+                    Toast.LENGTH_SHORT).show()
+            else {
+                val res = viewModel.evaluate(str)   // вычисляем выражение под факториалом
+                val longRes = res.toLong()
+                if (res==longRes.toDouble()){
+                    // пишем целое число в ответе
+                    val value: Int = res.toString().toDouble().toInt()
+                    val fact: Int = viewModel.factorial(value)
+                    tvMain.setText(fact.toString())
+                    tvsec.text = "${value}!"
+                }
+                else
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Error! Rational number under factorial!",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
+                }
         }
 
         return binding.root
     }
-
-
-
-
-
 
 }
