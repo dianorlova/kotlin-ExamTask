@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
     app:startDestination="@id/calculatorFragment">
     <fragment
         android:id="@+id/calculatorFragment"
         android:name="com.example.examtask.calculator.CalculatorFragment"
         android:label="CalculatorFragment" />
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.example.examtask.about.AboutFragment"
+        android:label="fragment_about"
+        tools:layout="@layout/fragment_about" />
 </navigation>
