@@ -5,8 +5,8 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#FF000000</color>
 
     <!--Оттенки цвета для внешнего вида-->
     <color name="blac_shade_1">#292D36</color>
@@ -14,6 +14,5 @@
     <color name="black_shade_3">#22252D</color>
     <color name="orange">#ffa500</color>
 
-    <color name="calculator_text">#FF000000</color>
-    <color name="calculator_btn">#FFFFFFFF</color>
+    <color name="calculator_text">#FFFFFFFF</color>
 </resources>

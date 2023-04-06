@@ -5,15 +5,12 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/black_shade_3">
-
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/idTVSecondary"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:background="@color/black_shade_3"
             android:ellipsize="start"
             android:gravity="bottom"
             android:maxLines="1"
@@ -22,26 +19,25 @@
             android:singleLine="true"
             android:text=""
             android:textAlignment="viewEnd"
-            android:textColor="@color/white"
+            android:textColor="@color/calculator_text"
             android:textSize="20sp"
-            tools:ignore="RtlCompat" />
+            tools:ignore="RtlCompat"/>
 
         <TextView
             android:id="@+id/idTVprimary"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_below="@id/idTVSecondary"
-            android:background="@color/black_shade_3"
             android:ellipsize="end"
             android:gravity="bottom"
+            android:layout_below="@id/idTVSecondary"
             android:maxLines="1"
             android:padding="10dp"
             android:singleLine="true"
             android:text=""
             android:textAlignment="viewEnd"
-            android:textColor="@color/white"
+            android:textColor="@color/calculator_text"
             android:textSize="50sp"
-            tools:ignore="RtlCompat" />
+            tools:ignore="RtlCompat"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -143,7 +139,7 @@
                                 style="@style/ActionButton"
                                 android:text="ln"
                                 android:textAllCaps="false"
-                                 />
+                                />
 
                         </LinearLayout>
 
@@ -173,7 +169,7 @@
                                 style="@style/ActionButton"
                                 android:text="x²"
                                 android:textAllCaps="false"
-                               />
+                                />
 
                             <Button
                                 android:id="@+id/bsquarerootdegree"
@@ -191,7 +187,7 @@
                                 android:id="@+id/bdiv"
                                 style="@style/ActionButton"
                                 android:text="/"
-                                 />
+                                />
 
                         </LinearLayout>
 
@@ -220,13 +216,13 @@
                                 android:id="@+id/b7"
                                 style="@style/NumberButton"
                                 android:text="7"
-                                 />
+                                />
 
                             <Button
                                 android:id="@+id/b8"
                                 style="@style/NumberButton"
                                 android:text="8"
-                                 />
+                                />
 
                             <Button
                                 android:id="@+id/b9"
@@ -238,7 +234,7 @@
                                 android:id="@+id/bmul"
                                 style="@style/ActionButton"
                                 android:text="×"
-                                 />
+                                />
 
                         </LinearLayout>
 
@@ -260,13 +256,13 @@
                                 android:id="@+id/bsqrt"
                                 style="@style/ActionButton"
                                 android:text="√"
-                                 />
+                                />
 
                             <Button
                                 android:id="@+id/b4"
                                 style="@style/NumberButton"
                                 android:text="4"
-                               />
+                                />
 
                             <Button
                                 android:id="@+id/b5"
@@ -285,7 +281,7 @@
                                 style="@style/ActionButton"
 
                                 android:text="-"
-                                 />
+                                />
 
                         </LinearLayout>
 
@@ -308,7 +304,7 @@
                                 style="@style/ConstButton"
                                 android:text="π"
                                 android:textAllCaps="false"
-                                 />
+                                />
 
                             <Button
                                 android:id="@+id/b1"
@@ -320,7 +316,7 @@
                                 android:id="@+id/b2"
                                 style="@style/NumberButton"
                                 android:text="2"
-                                 />
+                                />
 
                             <Button
                                 android:id="@+id/b3"
@@ -373,7 +369,7 @@
                                 android:backgroundTint="@color/black_shade_2"
                                 android:padding="6dp"
                                 android:text="0"
-                                android:textColor="@color/white"
+                                android:textColor="@color/calculator_btn"
                                 android:textSize="15sp" />
 
                             <Button
@@ -385,7 +381,7 @@
                                 android:backgroundTint="@color/black_shade_2"
                                 android:padding="6dp"
                                 android:text="."
-                                android:textColor="@color/white"
+                                android:textColor="@color/calculator_btn"
                                 android:textSize="15sp" />
 
                             <Button
@@ -397,7 +393,7 @@
                                 android:backgroundTint="@color/orange"
                                 android:padding="6dp"
                                 android:text="="
-                                android:textColor="@color/white"
+                                android:textColor="@color/calculator_text"
                                 android:textSize="15sp" />
 
                         </LinearLayout>

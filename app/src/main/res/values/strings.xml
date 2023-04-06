@@ -2,4 +2,38 @@
     <string name="app_name">ExamTask</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_text">
+        <b>21. Engineering Calculator</b>
+        \n
+        The calculator application should allow you to perform the following operations:
+            \n* Addition,
+            \n* Subtraction,
+            \n* Multiplication,
+            \n* Division,
+            \n* Calculating the percentage of a number,
+            \n* Calculating the factorial of a number,
+            \n* The ability to specify an expression in parentheses,
+            \n* Calculating the square power of a number,
+            \n* Raising a number to an arbitrary power,
+            \n* Calculating the square root of a number,
+            \n* Calculating the root of an arbitrary power of a number,
+            \n* Calculation of trigonometric functions: sin, cos, tg,
+            \n* Calculating the decimal logarithm of a number,
+            \n* Calculating the logarithm of degree e,
+            \n* Introduction of the numbers π and e with an accuracy of 10 decimal places.
+        \n
+        \nThe application should allow you to enter both integers and decimals.
+        \nThe application should allow you to delete the last entered character, as well as reset all entered data.
+    </string>
+    <string name="enter_valid_number">Please enter a valid number!</string>
+    <string name="open_brace_error">Error! Open brace \'(\' not found!</string>
+    <string name="incorrect_braces">Error! Brackets \'(\' and \')\' placed incorrectly!</string>
+    <string name="negative_factorial">Error! Negative number under factorial!</string>
+    <string name="rational_under_factorial">Error! Rational number under factorial! </string>
+    <string name="negative_percent">Error! Negative number under percent!</string>
+    <string name="about_menu">About</string>
+    <string name="calculator_menu">Calculator</string>
+    <string name="empty_braces">Error! You cannot close a parenthesis with an empty value!</string>
+    <string name="negative_under_root">Error! Negative number under root!</string>
+    <string name="many_dots">Error! Too many dots in number!</string>
 </resources>

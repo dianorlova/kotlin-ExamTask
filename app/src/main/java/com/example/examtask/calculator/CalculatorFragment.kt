@@ -1,7 +1,7 @@
 package com.example.examtask.calculator
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.examtask.R
 import com.example.examtask.databinding.FragmentCalculatorBinding
+
 
 class CalculatorFragment : Fragment() {
 
@@ -60,6 +62,7 @@ class CalculatorFragment : Fragment() {
     private var bracket_count: Int = 0  // считает количество открытых и закрытых скобок\
     private var tvsecString = ""
     private var tvmainString = ""
+    private var isPoint = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -112,11 +115,14 @@ class CalculatorFragment : Fragment() {
         bdot = binding.bdot
         bdiv = binding.bdiv
 
-        // Если у нас есть какие-то сохраненные зеначения (не равны null), то записываем эти значения в наши переменные
+        tvMain.movementMethod = ScrollingMovementMethod()
+
+        // Если у нас есть какие-то сохраненные значения (не равны null), то записываем эти значения в наши переменные
         if (savedInstanceState != null) {
             bracket_count = savedInstanceState.getInt("key_bracket_count")
             tvmainString = savedInstanceState.getString("key_tvmain_string").toString()
             tvsecString = savedInstanceState.getString("key_tvsec_string").toString()
+            isPoint = savedInstanceState.getBoolean("key_is_point")
 
             tvMain.text = tvmainString
             tvsec.text = tvsecString
@@ -170,12 +176,21 @@ class CalculatorFragment : Fragment() {
         }
         bdot.setOnClickListener {
             val str: String = tvMain.text.toString()
-            // проверка, что вначале нет точки без целой части числа
-            if (!str.equals(".") and !str.isEmpty()) {
-                tvMain.text = (tvMain.text.toString() + ".")
-            } else
-                tvMain.text = (tvMain.text.toString() + "0.")
-            tvmainString = tvMain.text.toString()
+            if (!isPoint) {
+                // проверка, что вначале нет точки без целой части числа
+                if (!str.equals(".") and !str.isEmpty()) {
+                    tvMain.text = (tvMain.text.toString() + ".")
+                } else
+                    tvMain.text = (tvMain.text.toString() + "0.")
+                tvmainString = tvMain.text.toString()
+                isPoint = true
+            }
+            else
+                Toast.makeText(
+                    this.requireContext(),
+                    R.string.many_dots,
+                    Toast.LENGTH_SHORT
+                ).show()
             // проверка, что точка только одна
             // если символ точка не встретился ещё в сроке, то добавить точку
 //            if (str.indexOf(".")==-1){
@@ -193,6 +208,8 @@ class CalculatorFragment : Fragment() {
                 || str.get(index = str.length - 1).toString().equals("-")
                 || str.get(index = str.length - 1).toString().equals("*")
                 || str.get(index = str.length - 1).toString().equals("/")
+                || str.get(index = str.length - 1).toString().equals("^")
+                || str.get(index = str.length - 1).toString().equals("(")
                 || str.takeLast(3).equals("sin")
                 || str.takeLast(3).equals("cos")
                 || str.takeLast(3).equals("tan")
@@ -201,11 +218,13 @@ class CalculatorFragment : Fragment() {
             ) {
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
-            } else
+            } else {
                 tvMain.text = (tvMain.text.toString() + "+")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
         bdiv.setOnClickListener {
@@ -215,6 +234,8 @@ class CalculatorFragment : Fragment() {
                 || str.get(index = str.length - 1).toString().equals("-")
                 || str.get(index = str.length - 1).toString().equals("*")
                 || str.get(index = str.length - 1).toString().equals("/")
+                || str.get(index = str.length - 1).toString().equals("^")
+                || str.get(index = str.length - 1).toString().equals("(")
                 || str.takeLast(3).equals("sin")
                 || str.takeLast(3).equals("cos")
                 || str.takeLast(3).equals("tan")
@@ -223,14 +244,17 @@ class CalculatorFragment : Fragment() {
             ) {
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
-            } else
+            } else {
                 tvMain.text = (tvMain.text.toString() + "/")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
         bbrac1.setOnClickListener {
+            isPoint = false
             tvMain.text = (tvMain.text.toString() + "(")
             tvmainString = tvMain.text.toString()
             bracket_count += 1
@@ -241,11 +265,12 @@ class CalculatorFragment : Fragment() {
                 if(tvMain.text.toString().takeLast(1).equals("("))
                     Toast.makeText(
                         this.requireContext(),
-                        "Error! You cannot close a parenthesis with an empty value!",
+                        R.string.empty_braces,
                         Toast.LENGTH_SHORT
                     ).show()
                 else{
                     bracket_count -= 1
+                    isPoint = false
                     tvMain.text = (tvMain.text.toString() + ")")
                     tvmainString = tvMain.text.toString()
                 }
@@ -253,37 +278,55 @@ class CalculatorFragment : Fragment() {
             else
                 Toast.makeText(
                     this.requireContext(),
-                    "Error! Open brace '(' not found!",
+                    R.string.open_brace_error,
                     Toast.LENGTH_SHORT
                 ).show()
 
         }
         bpi.setOnClickListener {
             // при нажатии на кнопку Пи, к строке значения добавляется значение числа Пи с точностью в 10 знаков после запятой
-            tvMain.text = (tvMain.text.toString() + "3.1415926535")
-            tvmainString = tvMain.text.toString()
-            tvsec.text = bpi.text.toString()
-            tvsecString = tvsec.text.toString()
+            if(!isPoint) {
+                tvMain.text = (tvMain.text.toString() + "3.1415926535")
+                tvmainString = tvMain.text.toString()
+                tvsec.text = bpi.text.toString()
+                tvsecString = tvsec.text.toString()
+                isPoint = true
+            }
+            else
+                Toast.makeText(
+                    this.requireContext(),
+                    R.string.many_dots,
+                    Toast.LENGTH_SHORT
+                ).show()
         }
         be.setOnClickListener {
             // при нажатии на кнопку e, к строке значения добавляется значение числа e с точностью в 10 знаков после запятой
-            tvMain.text = (tvMain.text.toString() + "2.7182818284")
-            tvmainString = tvMain.text.toString()
-            tvsec.text = be.text.toString()
-            tvsecString = tvsec.text.toString()
+            if (!isPoint) {
+                tvMain.text = (tvMain.text.toString() + "2.7182818284")
+                tvmainString = tvMain.text.toString()
+                tvsec.text = be.text.toString()
+                tvsecString = tvsec.text.toString()
+                isPoint = true
+            }
+            else
+                Toast.makeText(
+                    this.requireContext(),
+                    R.string.many_dots,
+                    Toast.LENGTH_SHORT
+                ).show()
         }
         bsin.setOnClickListener {
             val str: String = tvMain.text.toString()
             if (str.isNotEmpty()){
                 if (str.get(index = str.length - 1).toString().equals(".")
-                        || str.takeLast(3).equals("sin")
-                        || str.takeLast(3).equals("cos")
-                        || str.takeLast(3).equals("tan")
-                        || str.takeLast(3).equals("log")
-                        || str.takeLast(2).equals("ln"))
+                    || str.takeLast(3).equals("sin")
+                    || str.takeLast(3).equals("cos")
+                    || str.takeLast(3).equals("tan")
+                    || str.takeLast(3).equals("log")
+                    || str.takeLast(2).equals("ln"))
                     Toast.makeText(
                         this.requireContext(),
-                        "Please enter a valid number!",
+                        R.string.enter_valid_number,
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -296,11 +339,15 @@ class CalculatorFragment : Fragment() {
                     || str.takeLast(1).equals("7")
                     || str.takeLast(1).equals("8")
                     || str.takeLast(1).equals("9")
-                    || str.takeLast(1).equals("0"))
+                    || str.takeLast(1).equals("0")) {
                     tvMain.text = (tvMain.text.toString() + "*sin")
+                    isPoint = false
+                }
             }
-            else
+            else {
                 tvMain.text = (tvMain.text.toString() + "sin")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
         bcos.setOnClickListener {
@@ -314,7 +361,7 @@ class CalculatorFragment : Fragment() {
                     || str.takeLast(2).equals("ln"))
                     Toast.makeText(
                         this.requireContext(),
-                        "Please enter a valid number!",
+                        R.string.enter_valid_number,
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -327,11 +374,15 @@ class CalculatorFragment : Fragment() {
                     || str.takeLast(1).equals("7")
                     || str.takeLast(1).equals("8")
                     || str.takeLast(1).equals("9")
-                    || str.takeLast(1).equals("0"))
+                    || str.takeLast(1).equals("0")){
                     tvMain.text = (tvMain.text.toString() + "*cos")
+                    isPoint = false
+                }
             }
-            else
+            else {
                 tvMain.text = (tvMain.text.toString() + "cos")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
         btan.setOnClickListener {
@@ -358,16 +409,18 @@ class CalculatorFragment : Fragment() {
                     || str.takeLast(1).equals("7")
                     || str.takeLast(1).equals("8")
                     || str.takeLast(1).equals("9")
-                    || str.takeLast(1).equals("0"))
+                    || str.takeLast(1).equals("0")) {
                     tvMain.text = (tvMain.text.toString() + "*tan")
+                    isPoint = false
+                }
             }
-            else
+            else {
                 tvMain.text = (tvMain.text.toString() + "tan")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
-//        binv.setOnClickListener {
-//            tvMain.text = (tvMain.text.toString() + "^" + "(-1)")
-//        }
+
         bln.setOnClickListener {
             val str: String = tvMain.text.toString()
             if (str.isNotEmpty()){
@@ -392,11 +445,15 @@ class CalculatorFragment : Fragment() {
                     || str.takeLast(1).equals("7")
                     || str.takeLast(1).equals("8")
                     || str.takeLast(1).equals("9")
-                    || str.takeLast(1).equals("0"))
+                    || str.takeLast(1).equals("0")) {
                     tvMain.text = (tvMain.text.toString() + "*ln")
+                    isPoint = false
+                }
             }
-            else
+            else {
                 tvMain.text = (tvMain.text.toString() + "ln")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
         blog.setOnClickListener {
@@ -423,8 +480,10 @@ class CalculatorFragment : Fragment() {
                     || str.takeLast(1).equals("7")
                     || str.takeLast(1).equals("8")
                     || str.takeLast(1).equals("9")
-                    || str.takeLast(1).equals("0"))
+                    || str.takeLast(1).equals("0")) {
                     tvMain.text = (tvMain.text.toString() + "*log")
+                    isPoint = false
+                }
             }
             else
                 tvMain.text = (tvMain.text.toString() + "log")
@@ -452,10 +511,11 @@ class CalculatorFragment : Fragment() {
                 ) {
                     Toast.makeText(
                         this.requireContext(),
-                        "Please enter a valid number!",
+                        R.string.enter_valid_number,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else if (!str.get(index = str.length - 1).toString().equals("-")) {
+                    isPoint = false
                     tvMain.text = (tvMain.text.toString() + "-")
                 }
             tvmainString = tvMain.text.toString()
@@ -470,6 +530,8 @@ class CalculatorFragment : Fragment() {
                 || str.get(index = str.length - 1).toString().equals("-")
                 || str.get(index = str.length - 1).toString().equals("*")
                 || str.get(index = str.length - 1).toString().equals("/")
+                || str.get(index = str.length - 1).toString().equals("^")
+                || str.get(index = str.length - 1).toString().equals("(")
                 || str.takeLast(3).equals("sin")
                 || str.takeLast(3).equals("cos")
                 || str.takeLast(3).equals("tan")
@@ -478,11 +540,13 @@ class CalculatorFragment : Fragment() {
             ) {
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
-            } else
+            } else {
                 tvMain.text = (tvMain.text.toString() + "*")
+                isPoint = false
+            }
             tvmainString = tvMain.text.toString()
         }
         bsqrt.setOnClickListener {
@@ -493,6 +557,8 @@ class CalculatorFragment : Fragment() {
                 || str.get(index = str.length - 1).toString().equals("-")
                 || str.get(index = str.length - 1).toString().equals("*")
                 || str.get(index = str.length - 1).toString().equals("/")
+                || str.get(index = str.length - 1).toString().equals("^")
+                || str.get(index = str.length - 1).toString().equals("(")
                 || str.takeLast(3).equals("sin")
                 || str.takeLast(3).equals("cos")
                 || str.takeLast(3).equals("tan")
@@ -502,7 +568,7 @@ class CalculatorFragment : Fragment() {
                 // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
             } else
@@ -511,18 +577,19 @@ class CalculatorFragment : Fragment() {
                 )     // если число под корнем отрицательное
                     Toast.makeText(
                         this.requireContext(),
-                        "Error! Negative number under root!",
+                        R.string.negative_under_root,
                         Toast.LENGTH_SHORT
                     ).show()
                 else {
                     val d = viewModel.calculate(str)    // считаем число под корнем
                     // вычисляем квадратный корень из заданного числа
                     val sqrt = viewModel.getSqrt(d)
+                    isPoint = false
                     val longRes = sqrt.toLong()
 
                     if (sqrt == longRes.toDouble())
                         tvMain.setText(longRes.toString())  // пишем целое число в ответе
-                     else
+                    else
                         tvMain.setText(sqrt.toString())  // пишем рац число в ответе
 
                     if (d==d.toLong().toDouble())
@@ -535,14 +602,59 @@ class CalculatorFragment : Fragment() {
         }
 
         bdegree.setOnClickListener {
-            tvMain.text = tvMain.text.toString() + "^"
-            tvmainString = tvMain.text.toString()
+            val str: String = tvMain.text.toString()
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.get(index = str.length - 1).toString().equals("^")
+                || str.get(index = str.length - 1).toString().equals("(")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                Toast.makeText(
+                    this.requireContext(),
+                    R.string.enter_valid_number,
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                isPoint = false
+                tvMain.text = tvMain.text.toString() + "^"
+                tvmainString = tvMain.text.toString()
+            }
+
         }
 
         bsquarerootdegree.setOnClickListener {
-            tvMain.text = tvMain.text.toString() + "^(1/"
-            bracket_count += 1
-            tvmainString = tvMain.text.toString()
+            val str: String = tvMain.text.toString()
+            if (str.isEmpty() || str.get(index = str.length - 1).toString().equals(".")
+                || str.get(index = str.length - 1).toString().equals("+")
+                || str.get(index = str.length - 1).toString().equals("-")
+                || str.get(index = str.length - 1).toString().equals("*")
+                || str.get(index = str.length - 1).toString().equals("/")
+                || str.get(index = str.length - 1).toString().equals("^")
+                || str.get(index = str.length - 1).toString().equals("(")
+                || str.takeLast(3).equals("sin")
+                || str.takeLast(3).equals("cos")
+                || str.takeLast(3).equals("tan")
+                || str.takeLast(3).equals("log")
+                || str.takeLast(2).equals("ln")
+            ) {
+                Toast.makeText(
+                    this.requireContext(),
+                    R.string.enter_valid_number,
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                isPoint = false
+                tvMain.text = tvMain.text.toString() + "^(1/"
+                bracket_count += 1
+                tvmainString = tvMain.text.toString()
+            }
         }
 
         bequal.setOnClickListener {
@@ -551,7 +663,7 @@ class CalculatorFragment : Fragment() {
             if (bracket_count!=0)
                 Toast.makeText(
                     this.requireContext(),
-                    "Error! Brackets '(' and ')' placed incorrectly!",
+                    R.string.incorrect_braces,
                     Toast.LENGTH_SHORT
                 ).show()
             else {
@@ -571,13 +683,14 @@ class CalculatorFragment : Fragment() {
                 ) {
                     Toast.makeText(
                         this.requireContext(),
-                        "Please enter a valid number!",
+                        R.string.enter_valid_number,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     // по кнопке равенства (=) вычисляется результат
                     val result = viewModel.calculate(str)
                     val longRes = result.toLong()
+                    isPoint = false
                     if (result == longRes.toDouble())
                         tvMain.setText(longRes.toString()) // пишем целое число в ответе
                     else
@@ -594,6 +707,7 @@ class CalculatorFragment : Fragment() {
             tvsec.setText("")
             tvmainString = tvMain.text.toString()
             tvsecString = tvsec.text.toString()
+            isPoint = false
             bracket_count=0     // сбрасываем счётчик скобок
         }
         bc.setOnClickListener {
@@ -614,6 +728,8 @@ class CalculatorFragment : Fragment() {
                         bracket_count += 1
                     if (str.takeLast(1).equals("("))
                         bracket_count -= 1
+                    if (str.takeLast(1).equals("."))
+                        isPoint = false
                     str = str.substring(0, str.length - 1)
                 }
                 tvMain.text = str
@@ -636,7 +752,7 @@ class CalculatorFragment : Fragment() {
                 // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -644,6 +760,7 @@ class CalculatorFragment : Fragment() {
                 val d = viewModel.calculate(str)    // считаем число (выражение в скобках)
                 val square = viewModel.square(d)
                 val longRes = square.toLong()
+                isPoint = false
                 if (square == longRes.toDouble()) {
                     tvMain.setText(longRes.toString()) // пишем целое число в ответе
                     tvsec.text = "${d.toInt()}²"
@@ -670,31 +787,32 @@ class CalculatorFragment : Fragment() {
                 // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
             } else  // если число под факториалом отрицательное
                 if (viewModel.calculate(str).toDouble() < 0)
-                Toast.makeText(
-                    this.requireContext(),
-                    "Error! Negative number under factorial!",
-                    Toast.LENGTH_SHORT).show()
-            else {
-                val res = viewModel.calculate(str)   // вычисляем выражение под факториалом
-                val longRes = res.toLong()
-                if (res==longRes.toDouble()){
-                    // пишем целое число в ответе
-                    val value: Int = res.toString().toDouble().toInt()
-                    val fact: Int = viewModel.factorial(value)
-                    tvMain.setText(fact.toString())
-                    tvsec.text = "${value}!"
-                }
-                else
                     Toast.makeText(
                         this.requireContext(),
-                        "Error! Rational number under factorial!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        R.string.negative_factorial,
+                        Toast.LENGTH_SHORT).show()
+                else {
+                    val res = viewModel.calculate(str)   // вычисляем выражение под факториалом
+                    val longRes = res.toLong()
+                    isPoint = false
+                    if (res==longRes.toDouble()){
+                        // пишем целое число в ответе
+                        val value: Int = res.toString().toDouble().toInt()
+                        val fact: Int = viewModel.factorial(value)
+                        tvMain.setText(fact.toString())
+                        tvsec.text = "${value}!"
+                    }
+                    else
+                        Toast.makeText(
+                            this.requireContext(),
+                            R.string.rational_under_factorial,
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                 }
             tvmainString = tvMain.text.toString()
@@ -716,18 +834,19 @@ class CalculatorFragment : Fragment() {
                 // если введенное число пусто или заканчивается мат.операцией, мы показываем сообщение об ошибке
                 Toast.makeText(
                     this.requireContext(),
-                    "Please enter a valid number!",
+                    R.string.enter_valid_number,
                     Toast.LENGTH_SHORT
                 ).show()
             } else  // если число под процентом отрицательное
                 if (viewModel.calculate(str).toDouble() < 0)
                     Toast.makeText(
                         this.requireContext(),
-                        "Error! Negative number under percent!",
+                        R.string.negative_percent,
                         Toast.LENGTH_SHORT).show()
                 else {
                     val res = viewModel.calculate(str)   // вычисляем выражение под процентом
                     val longRes = res.toLong()
+                    isPoint = false
                     // пишем вещественное число в ответе
                     val value: Double = res.toString().toDouble()
                     val percent: Double = viewModel.percent(value)
@@ -751,5 +870,14 @@ class CalculatorFragment : Fragment() {
         outState.putInt("key_bracket_count", bracket_count)
         outState.putString("key_tvmain_string", tvmainString)
         outState.putString("key_tvsec_string", tvsecString)
+        outState.putBoolean("key_is_point", isPoint)
     }
+
+//    override fun onStop() {
+//        super.onStop()
+//        bracket_count = 0
+//        tvmainString = ""
+//        tvsecString = ""
+//        isPoint = false
+//    }
 }

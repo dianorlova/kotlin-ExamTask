@@ -7,10 +7,10 @@
     <fragment
         android:id="@+id/calculatorFragment"
         android:name="com.example.examtask.calculator.CalculatorFragment"
-        android:label="CalculatorFragment" />
+        android:label="@string/calculator_menu" />
     <fragment
         android:id="@+id/aboutFragment"
         android:name="com.example.examtask.about.AboutFragment"
-        android:label="fragment_about"
+        android:label="@string/about_menu"
         tools:layout="@layout/fragment_about" />
 </navigation>
